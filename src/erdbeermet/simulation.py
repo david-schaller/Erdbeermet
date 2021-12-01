@@ -275,7 +275,7 @@ if __name__ == '__main__':
     print(siml2.get_linear_ordering())
     
     import os
-    import FileIO
+    import erdbeermet.tools.FileIO as FileIO
     
     result_dir = 'testfiles'
     

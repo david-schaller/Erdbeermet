@@ -6,11 +6,11 @@ __author__ = 'David Schaller'
 
 from erdbeermet.simulation import Simulator, MetricFromEvents
 from erdbeermet.recognition import recognize
-import erdbeermet.FileIO as FileIO
+import erdbeermet.tools.FileIO as FileIO
 
 
 # --- change filename here ---
-history_file = '../examples_ids/eid0003_n6_history'
+history_file = './example_histories/eid0003_n6_history'
 
 
 history = FileIO.parse_history(history_file)
@@ -31,14 +31,6 @@ print('# Successes:', rec_tree.successes)
    
 # call visualize() function of the Tree instance 'rec_tree'
 rec_tree.visualize()
-
-# ------------------------------------------------------------------------------
-
-# use LaTeX
-#      --> works only if installed
-#      --> slower
-
-#rec_tree.visualize(use_latex=True)
 
 # ------------------------------------------------------------------------------
 

@@ -5,6 +5,14 @@ from scipy.linalg import solve
 import matplotlib.pyplot as plt
 
 
+def plot_box_graph(distances, labels=None):
+    
+    box = Box4(distances, labels=None)
+    box.plot()
+    
+    return box
+
+
 def distance_vector_from_matrix(matrix):
     
     dim = matrix.shape[0]
@@ -273,10 +281,9 @@ if __name__ == "__main__":
                   [1.05214628,  0.42562244,  0.00000000,  0.79758146],
                   [0.29456482,  1.09231702,  0.79758146,  0.00000000]])
     
-    box = Box4(D)
+    box = plot_box_graph(D)
     print(box._diagonal_mode)
     print(box.solutions)
     print(box.first_solution())
-    box.plot()
     print(box.is_R_metric())
     

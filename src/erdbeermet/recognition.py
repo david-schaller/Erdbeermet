@@ -397,7 +397,6 @@ def recognize(D, first_candidate_only=False):
 if __name__ == '__main__':
     
     from simulation import Simulator
-    from FileIO import write_recognition
     
     sim = Simulator(6)
     sim.print_history()
@@ -407,5 +406,4 @@ if __name__ == '__main__':
     recognition_tree = recognize(sim.D)
     print(recognition_tree.to_newick())
     print(recognition_tree.successes)
-    write_recognition('testfiles/testfile_recognition_tree.txt',
-                      recognition_tree)
+    recognition_tree.write_to_file('testfiles/testfile_recognition_tree.txt')

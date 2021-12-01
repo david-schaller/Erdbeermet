@@ -3,16 +3,9 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-from distutils.spawn import find_executable
-
 from matplotlib import rc
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('font',**{'family':'serif','serif':['Palatino']})
-
-if find_executable('latex'):
-    LATEX_INSTALLED = True
-else:
-    LATEX_INSTALLED = False
 
 
 __author__ = 'David Schaller'
@@ -25,25 +18,16 @@ class Visualizer:
                  'no candidate': r'no candidate',
                  'spikes too short': r'spikes too short'}
     
-    def __init__(self, tree, decimal_prec=4, save_as=None, use_latex=False):
+    def __init__(self, tree, decimal_prec=4, save_as=None):
         
         self.tree = tree
         self.decimal_prec = decimal_prec
-        if use_latex and LATEX_INSTALLED:
-            self.use_latex = True
-            rc('text', usetex=True)
-        elif use_latex and not LATEX_INSTALLED:
-            print('could not find LaTeX installation')
-            self.use_latex = False
-        else:
-            self.use_latex = False
-            rc('text', usetex=False)
         
         self.edge_length = 0.5
         self.symbolsize = 0.03
         self.symbollw = 0.04
         self.leafs_per_vertical_unit = 10
-        self.fs = 10 if self.use_latex else 9
+        self.fs = 9
         self.symbol_zorder = 3       
         
         print(tree.to_newick())
@@ -202,29 +186,9 @@ class Visualizer:
         
         x, y = self.node_positions[v]
         
-        if self.use_latex and v.info in Visualizer.info_dict:
-            text = Visualizer.info_dict[v.info]
-        else:
-            text = v.info
+        text = v.info
         
         self.ax.text(x+self.symbolsize/2+0.02, y, text,
                      horizontalalignment='left',
                      verticalalignment='center',
                      fontsize=self.fs)
-
-
-if __name__ == '__main__':
-    
-    from erdbeermet.simulation import Simulator
-    from erdbeermet.recognition import recognize
-    
-    sim = Simulator(7)
-    sim.print_history()
-    print(sim.D)
-    
-    print('-------------------- Recognition --------------------')
-    rec_tree = recognize(sim.D)
-    print(rec_tree.to_newick())
-    
-    Visualizer(rec_tree, decimal_prec=5, save_as='../testfiles/test_tree.pdf',
-               use_latex=False)

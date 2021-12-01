@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from erdbeermet.visualize.RecognitionVis import Visualizer
+from erdbeermet.tools.FileIO import write_recognition
 
 
 __author__ = 'David Schaller'
@@ -142,10 +143,14 @@ class Tree:
             return ';'
         
     
-    def visualize(self, decimal_prec=4, save_as=None, use_latex=False):
+    def visualize(self, decimal_prec=4, save_as=None):
         
-        Visualizer(self, decimal_prec=decimal_prec, save_as=save_as,
-                   use_latex=use_latex)
+        Visualizer(self, decimal_prec=decimal_prec, save_as=save_as)
+    
+    
+    def write_to_file(self, filename):
+        
+        write_recognition(filename, self)
     
     
     def _assert_integrity(self):
