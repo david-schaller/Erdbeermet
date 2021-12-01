@@ -3,6 +3,8 @@
 import numpy as np
 import networkx as nx
 
+import erdbeermet.tools.FileIO as FileIO
+
 
 def R_metric_on_4(p, q, a, dx=0, dy=0, dz=0, du=0):
     
@@ -39,6 +41,11 @@ class SimulatorInterface:
     def get_linear_ordering(self):
         
         return self.linear_ordering
+    
+    
+    def write_history(self, filename):
+        
+        FileIO.write_history(filename, self.history)
     
     
     def print_history(self):
@@ -245,25 +252,16 @@ class MetricFromEvents(SimulatorInterface):
 
 if __name__ == '__main__':
     
-    p = 0.01
-    q = 1.0
-    a = 0.3
-    dx = 0.5
-    dy = 0.5
-    dz = 0.5
-    du = 0.5
-    
-#    from erdbeermet.Box4 import Box4
-    
-#    b = R_metric_on_4(p, q, a, dx=dx, dy=dy, dz=dz, du=du)
-#    print(b)
-#    box = Box4(b)
-#    print(box._diagonal_mode, box.solutions)
-#    box.plot()
-    
     sim = Simulator(6)
     print(sim.D)
     sim.print_history()
+    
+    # write history to file
+    import os
+    result_dir = 'testfiles'
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
+    sim.write_history(os.path.join(result_dir, 'history'))
     
     siml = Simulator(6, linear=True)
     print(siml.D)
@@ -274,12 +272,3 @@ if __name__ == '__main__':
     print(siml2.D)
     print(siml2.get_linear_ordering())
     
-    import os
-    import erdbeermet.tools.FileIO as FileIO
-    
-    result_dir = 'testfiles'
-    
-    if not os.path.exists(result_dir):
-        os.makedirs(result_dir)
-    
-    FileIO.write_history(os.path.join(result_dir, 'history'), sim.history)
