@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from erdbeermet.tools.visualization import Visualizer
+from erdbeermet.visualize.RecognitionVis import Visualizer
 
 
 __author__ = 'David Schaller'
