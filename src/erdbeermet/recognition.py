@@ -169,12 +169,13 @@ def _compute_alpha(V, D, x, y, z, u, v):
         return np.nan
 
     
-def _find_candidates(D, V):
+def _find_candidates(D, V, print_info):
     
     candidates = []
     n = len(V)
     
-    print(f'-----> n = {n}, V = {V} ---> Candidates')
+    if print_info: print(f'-----> n = {n}, V = {V} ---> Candidates')
+    
     for x, y, z in permutations(V, 3):
         
         # considering x < y suffices
@@ -205,12 +206,14 @@ def _find_candidates(D, V):
             if alpha[0] >= 0.0 and alpha[0] <= 1.0:
                 candidates.append((x, y, z, u_witness, alpha[0]))
                 deltas = _compute_deltas(V, D, alpha[0], x, y, z, u_witness)
-                print(f'({x}, {y}: {z}) alpha={alpha}', end='   ')
-                print('δx = {:.3f}, δy = {:.3f}, '\
-                      'δz = {:.3f}, dxy = {:.3f}'.format(deltas[2],
-                                                         deltas[3],
-                                                         deltas[0],
-                                                         deltas[1]))
+                
+                if print_info: 
+                    print(f'({x}, {y}: {z}) alpha={alpha}', end='   ')
+                    print('δx = {:.3f}, δy = {:.3f}, '\
+                          'δz = {:.3f}, dxy = {:.3f}'.format(deltas[2],
+                                                             deltas[3],
+                                                             deltas[0],
+                                                             deltas[1]))
             
         elif not np.all(nan_mask):
             
@@ -305,10 +308,10 @@ def _finalize_tree(recognition_tree):
     _sort_children(recognition_tree.root)
     
     
-def recognize(D, first_candidate_only=False):
+def recognize(D, first_candidate_only=False, print_info=False):
     
     if not is_pseudometric(D):
-        print("no metric")
+        if print_info: print("no metric")
         return False
     
     n = D.shape[0]
@@ -328,11 +331,12 @@ def recognize(D, first_candidate_only=False):
         
         if n > 4:
         
-            candidates = _find_candidates(D, V)
+            candidates = _find_candidates(D, V, print_info)
             
             found_valid = False
             
-            print(f'-----> n = {n}, V = {V} ---> R-steps actually carried out')
+            if print_info: 
+                print(f'-----> n = {n}, V = {V} ---> R-steps actually carried out')
             for x, y, z, u_witness, alpha in candidates:
                 
                 V_copy = V.copy()
@@ -343,16 +347,17 @@ def recognize(D, first_candidate_only=False):
                 
                 deltas = _compute_deltas(V, D, alpha, x, y, z, u_witness)
                 
-                print('({}, {}: {}) alpha={:.5f}'.format(x, y, z, alpha),
-                      end='   ')
-                print('δx = {:.3f}, δy = {:.3f}, '\
-                      'δz = {:.3f}, dxy = {:.3f}'.format(deltas[2],
-                                                         deltas[3],
-                                                         deltas[0],
-                                                         deltas[1]))
+                if print_info:
+                    print('({}, {}: {}) alpha={:.5f}'.format(x, y, z, alpha),
+                          end='   ')
+                    print('δx = {:.3f}, δy = {:.3f}, '\
+                          'δz = {:.3f}, dxy = {:.3f}'.format(deltas[2],
+                                                             deltas[3],
+                                                             deltas[0],
+                                                             deltas[1]))
                 
                 if not _all_non_negative(deltas):
-                    print('         |___ negative δ/dxy')
+                    if print_info: print('         |___ negative δ/dxy')
                     child.info = 'negative delta/dxy'
                     continue
                 
@@ -365,13 +370,13 @@ def recognize(D, first_candidate_only=False):
                                                             V=V_copy)
                 
                 if not still_metric:
-                    print('         |___ no pseudometric')
-                    print(f'         |___ {metric_info}')
+                    if print_info: print('         |___ no pseudometric')
+                    if print_info: print(f'         |___ {metric_info}')
                     child.info = 'no pseudometric'
                     continue
                 
                 found_valid = True
-                print(f'         |___ STACKED {V_copy}')
+                if print_info: print(f'         |___ STACKED {V_copy}')
                 stack.append(child)
                 
                 # for n = 5 always check all candidates
@@ -382,28 +387,13 @@ def recognize(D, first_candidate_only=False):
                 parent.info = 'no candidate'
                 
         else:
-            print(f'-----> n = {n} R-map test')
+            if print_info: print(f'-----> n = {n} R-map test')
             if recognize4_matrix_only(D):
-                print(f'SUCCESS on {V}')
+                if print_info: print(f'SUCCESS on {V}')
                 parent.valid_ways = 1
             else:
-                print(f'NO R-MAP on {V}')
+                if print_info: print(f'NO R-MAP on {V}')
                 parent.info = 'spikes too short'
     
     _finalize_tree(recognition_tree)    
     return recognition_tree
-
-
-if __name__ == '__main__':
-    
-    from simulation import simulate
-    
-    scenario = simulate(6)
-    scenario.print_history()
-    print(scenario.D)
-    
-    print('-------------------- Recognition --------------------')
-    recognition_tree = recognize(scenario.D)
-    print(recognition_tree.to_newick())
-    print(recognition_tree.successes)
-    recognition_tree.write_to_file('testfiles/testfile_recognition_tree.txt')
