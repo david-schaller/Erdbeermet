@@ -8,10 +8,10 @@ import erdbeermet.tools.FileIO as FileIO
 
 class Scenario:
     
-    def __init__(self, N, linear):
+    def __init__(self, N, circular):
         
         self.N = N
-        self.linear = linear
+        self.circular = circular
         
         self.history = []
         self.D = np.zeros((self.N, self.N))
@@ -27,9 +27,19 @@ class Scenario:
         return self.history
     
     
-    def get_linear_ordering(self):
+    def get_circular_ordering(self):
         
-        return self.linear_ordering
+        visited = {0}
+        ordering = [0]
+        while True:
+            succ = next(self.L.successors(ordering[-1]))
+            if succ in visited:
+                break
+            else:
+                ordering.append(succ)
+                visited.add(succ)
+        
+        return ordering
     
     
     def write_history(self, filename):
@@ -45,21 +55,23 @@ class Scenario:
             print(f"({x}, {y}: {z}) {alpha}; {delta_str}")
 
 
-def simulate(N, branching_prob=0.0, linear=False, clocklike=False):
+def simulate(N, branching_prob=0.0, circular=False, clocklike=False):
     
-    if linear and branching_prob > 0.0:
+    if circular and branching_prob > 0.0:
         raise ValueError('pure duplication events are not allowed for '\
-                         'linear type R metrics')
+                         'circular type R metrics')
     
-    scenario = Scenario(N, linear)
+    scenario = Scenario(N, circular)
     scenario.branching_prob = branching_prob
     scenario.clocklike = clocklike
     
     D = scenario.D
     
-    if linear:
-        L = nx.DiGraph()
+    if circular:
+        scenario.L = nx.DiGraph()
+        L = scenario.L
         L.add_node(0)
+        L.add_edge(0, 0)
     
     for z in range(1, N):
         
@@ -75,21 +87,19 @@ def simulate(N, branching_prob=0.0, linear=False, clocklike=False):
                 D[u, z] = D[x, z]
                 D[z, u] = D[x, z]
                 
-            if linear:
+            if circular:
+                y = next(L.successors(x))
+                L.remove_edge(x, y)
                 L.add_edge(x, z)
+                L.add_edge(z, y)
                 
         # recombination event      
         else:
-            if not linear:
+            if not circular:
                 x, y = np.random.choice(z, size=2, replace=False)
             else:
                 x = np.random.randint(z)
-                
-                if L.out_degree(x) > 0:
-                    y = list(L.successors(x))[0]
-                else:
-                    y = x
-                    x = list(L.predecessors(y))[0]
+                y = next(L.successors(x))
                     
                 L.remove_edge(x, y)
                 L.add_edge(x, z)
@@ -109,7 +119,7 @@ def simulate(N, branching_prob=0.0, linear=False, clocklike=False):
             D[z, y] = alpha * D[x, y]
             D[y, z] = alpha * D[x, y]
         
-        # distance increment, i.e. independent evolution after event
+        # distance increment, i.e., independent evolution after event
         if not clocklike:
             delta = np.random.exponential(scale=1/N, size=z+1)
         else:
@@ -123,13 +133,10 @@ def simulate(N, branching_prob=0.0, linear=False, clocklike=False):
                 
         scenario.history.append( (x, y, z, alpha, delta) )
     
-    scenario.linear_ordering = [u for u in nx.topological_sort(L)] if linear \
-                               else None
-    
     return scenario
     
 
-def scenario_from_history(history, linear=False, stop_after=False):
+def scenario_from_history(history, circular=False, stop_after=False):
         
     if stop_after is False:
         N = len(history) + 1
@@ -138,13 +145,15 @@ def scenario_from_history(history, linear=False, stop_after=False):
     else:
         raise RuntimeError(f'not enough events to simulate {stop_after} items')
     
-    scenario = Scenario(N, linear)
+    scenario = Scenario(N, circular)
     
     D = scenario.D
     
-    if linear:
-        L = nx.DiGraph()
+    if circular:
+        scenario.L = nx.DiGraph()
+        L = scenario.L
         L.add_node(0)
+        L.add_edge(0, 0)
         
     for i in range(N-1):
         x, y, z, alpha, delta = history[i]
@@ -164,13 +173,16 @@ def scenario_from_history(history, linear=False, stop_after=False):
                 D[u, z] = D[x, z]
                 D[z, u] = D[x, z]
                 
-            if linear:
+            if circular:
+                L.remove_edge(x, y)
                 L.add_edge(x, z)
+                L.add_edge(z, y)
                 
         # recombination event      
         else:
-            if linear:
-                if y not in L.successors(x):
+            if circular:
+                print(history[i])
+                if not L.has_edge(x, y):
                     raise RuntimeError(f"'{x}' and '{y}' are not neighbors!")
                     
                 L.remove_edge(x, y)
@@ -200,17 +212,14 @@ def scenario_from_history(history, linear=False, stop_after=False):
                 D[q, p] = D[p, q]
         
         scenario.history.append( (x, y, z, alpha, delta) )
-                
-    scenario.linear_ordering = [u for u in nx.topological_sort(L)] if linear \
-                               else None
     
     return scenario
 
 
-def load(filename, linear=False, stop_after=False):
+def load(filename, circular=False, stop_after=False):
     
     return scenario_from_history(FileIO.parse_history(filename),
-                                 linear=linear,
+                                 circular=circular,
                                  stop_after=stop_after)
 
 

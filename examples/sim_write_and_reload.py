@@ -9,7 +9,7 @@ if not os.path.exists(result_dir):
     os.makedirs(result_dir)
 
 
-# ------------------ non-linear R matrix ------------------
+# ------------------ non-circular R matrix ------------------
 
 scenario = simulate(6)
 print(scenario.D)
@@ -25,19 +25,19 @@ print(scenario_reloaded.D)
 scenario_reloaded.print_history()
 
 
-# ------------------ linear R matrix ------------------
+# ------------------ circular R matrix ------------------
 
-scenario_linear = simulate(6, linear=True)
-print(scenario_linear.D)
-scenario_linear.print_history()
-print(scenario_linear.get_linear_ordering())
+scenario_circular = simulate(6, circular=True)
+print(scenario_circular.D)
+scenario_circular.print_history()
+print(scenario_circular.get_circular_ordering())
 
 # write history to file
-scenario.write_history(os.path.join(result_dir, 'testfile_history_linear'))
+scenario_circular.write_history(os.path.join(result_dir, 'testfile_history_circular'))
 
 # reload history to file
-scenario_reloaded2 = load(os.path.join(result_dir, 'testfile_history_linear'),
-                          linear=True)
+scenario_reloaded2 = load(os.path.join(result_dir, 'testfile_history_circular'),
+                          circular=True)
 
 print(scenario_reloaded2.D)
-print(scenario_reloaded2.get_linear_ordering())
+print(scenario_reloaded2.get_circular_ordering())
