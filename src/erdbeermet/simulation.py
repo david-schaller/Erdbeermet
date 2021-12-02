@@ -39,19 +39,10 @@ class Scenario:
     
     def print_history(self):
         
-        if hasattr(self, 'stop_after') and self.stop_after is not False:
-            events = self.stop_after - 1
-        else:
-            events = len(self.history)
-        
-        for i in range(events):
-            x, y, z, alpha, delta = self.history[i]
+        for x, y, z, alpha, delta in self.history:
             
             delta_str = '[' + ','.join(str(d) for d in delta) + ']'
             print(f"({x}, {y}: {z}) {alpha}; {delta_str}")
-        
-        if hasattr(self, 'stop_after') and self.stop_after is not False:
-            print(f'--- stopped after {self.stop_after} ---')
 
 
 def simulate(N, branching_prob=0.0, linear=False, clocklike=False):
@@ -198,7 +189,7 @@ def scenario_from_history(history, linear=False, stop_after=False):
             D[z, y] = alpha * D[x, y]
             D[y, z] = alpha * D[x, y]
         
-        # distance increment, i.e. independent evolution after event
+        # distance increment, i.e., independent evolution after event
         if len(delta) != z + 1:
             raise RuntimeError(f'invalid length of delta array for z={z}')
                     
@@ -234,27 +225,4 @@ def R_metric_on_4(p, q, a, dx=0, dy=0, dz=0, du=0):
     
     return np.array([xy, xz, xu, yz, yu, zu])
 
-
-if __name__ == '__main__':
-    
-    scenario = simulate(6)
-    print(scenario.D)
-    scenario.print_history()
-    
-    # write history to file
-    import os
-    result_dir = 'testfiles'
-    if not os.path.exists(result_dir):
-        os.makedirs(result_dir)
-    scenario.write_history(os.path.join(result_dir, 'history'))
-    
-    scenario_linear = simulate(6, linear=True)
-    print(scenario_linear.D)
-    scenario_linear.print_history()
-    print(scenario_linear.get_linear_ordering())
-    
-    scenario_linear2 = scenario_from_history(scenario_linear.history,
-                                             linear=True)
-    print(scenario_linear2.D)
-    print(scenario_linear2.get_linear_ordering())
     
