@@ -365,7 +365,7 @@ def recognize(D, first_candidate_only=False):
                                                             V=V_copy)
                 
                 if not still_metric:
-                    print(f'         |___ no pseudometric')
+                    print('         |___ no pseudometric')
                     print(f'         |___ {metric_info}')
                     child.info = 'no pseudometric'
                     continue
@@ -396,14 +396,14 @@ def recognize(D, first_candidate_only=False):
 
 if __name__ == '__main__':
     
-    from simulation import Simulator
+    from simulation import simulate
     
-    sim = Simulator(6)
-    sim.print_history()
-    print(sim.D)
+    scenario = simulate(6)
+    scenario.print_history()
+    print(scenario.D)
     
     print('-------------------- Recognition --------------------')
-    recognition_tree = recognize(sim.D)
+    recognition_tree = recognize(scenario.D)
     print(recognition_tree.to_newick())
     print(recognition_tree.successes)
     recognition_tree.write_to_file('testfiles/testfile_recognition_tree.txt')

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def plot_box_graph(distances, labels=None):
     
-    box = Box4(distances, labels=None)
+    box = Box4(distances, labels=labels)
     box.plot()
     
     return box

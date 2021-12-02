@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
-
-from erdbeermet.simulation import Simulator, MetricFromEvents
+from erdbeermet.simulation import load
 from erdbeermet.recognition import recognize
-import erdbeermet.tools.FileIO as FileIO
-from erdbeermet.Box4 import Box4
+from erdbeermet.visualize.BoxGraphVis import plot_box_graph
 
 
 # --- change filename here ---
 history_file = './example_histories/eid0003_n6_history'
 
 
-history = FileIO.parse_history(history_file)
-sim = MetricFromEvents(history)
-sim.print_history()
-print(sim.D)
+scenario = load(history_file)
+scenario.print_history()
+print(scenario.D)
 
 print('-------------------- Recognition --------------------')
-rec_tree = recognize(sim.D, first_candidate_only=False)
+rec_tree = recognize(scenario.D, first_candidate_only=False)
 
 print('---------')
 print('# Successes:', rec_tree.successes)
@@ -32,7 +28,4 @@ for v in rec_tree.preorder():
         print('matrix:')
         print(D)
 
-        box = Box4(D, labels=V)
-        print(box._diagonal_mode)
-        print(box.solutions)
-        box.plot()
+        plot_box_graph(D, labels=V)

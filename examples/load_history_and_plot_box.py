@@ -1,21 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
 
-from erdbeermet.simulation import Simulator, MetricFromEvents
-from erdbeermet.recognition import recognize
-import erdbeermet.tools.FileIO as FileIO
-from erdbeermet.Box4 import Box4
+from erdbeermet.simulation import load
+from erdbeermet.visualize.BoxGraphVis import plot_box_graph
 
 # --- change filename here ---
 history_file = './example_histories/eid0003_n6_history'
-history = FileIO.parse_history(history_file)
 
 # load a history until the fourth item is created (i.e. three event)
-sim = MetricFromEvents(history, stop_after=4)
-sim.print_history()
-print(sim.D)
+scenario = load(history_file, stop_after=4)
+scenario.print_history()
+print(scenario.D)
 
 # plot the 4x4 distance matrix as a box graph
-box = Box4(sim.D, labels=range(4))
-box.plot()
+plot_box_graph(scenario.D, labels=range(4))

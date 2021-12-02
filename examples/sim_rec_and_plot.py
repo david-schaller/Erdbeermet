@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 
-from erdbeermet.simulation import Simulator
+from erdbeermet.simulation import simulate
 from erdbeermet.recognition import recognize
 
 
-sim = Simulator(7)
-sim.print_history()
-print(sim.D)
+scenario = simulate(7)
+scenario.print_history()
+print(scenario.D)
 
 print('-------------------- Recognition --------------------')
-rec_tree = recognize(sim.D)
+rec_tree = recognize(scenario.D)
 print(rec_tree.to_newick())
 
 rec_tree.visualize(decimal_prec=5, save_as=False)
