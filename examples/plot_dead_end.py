@@ -20,6 +20,10 @@ print('---------')
 print('# Successes:', rec_tree.successes)
 
 
+# visualize recognition
+rec_tree.visualize()
+
+# visualize metric on remaining 4 elements
 for v in rec_tree.preorder():
     
     if v.n == 4 and v.info == 'spikes too short':
@@ -29,3 +33,4 @@ for v in rec_tree.preorder():
         print(D)
 
         plot_box_graph(D, labels=V)
+        break

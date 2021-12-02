@@ -30,7 +30,7 @@ class Visualizer:
         self.fs = 9
         self.symbol_zorder = 3       
         
-        print(tree.to_newick())
+        # print(tree.to_newick())
         
         self.distance_dict = {}
         self.colors = {}

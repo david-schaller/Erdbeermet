@@ -19,7 +19,7 @@ print('\n-------------------- Recognition --------------------\n')
 recognition_tree = recognize(scenario.D, print_info=True)
 print('\n')
 print(recognition_tree.to_newick())
-print('\ntotal no. of successes:', recognition_tree.successes)
+print('\n# successes:', recognition_tree.successes)
 
 
 # write the recognition into a text file
@@ -31,3 +31,8 @@ recognition_tree.write_to_file(os.path.join(result_dir,
 
 # visulize the recognition
 recognition_tree.visualize(decimal_prec=5, save_as=False)
+
+# save the plot as pdf by specififying the parameter:
+#      --> save_as='valid/path/filename_ending_with.pdf'
+
+# recognition_tree.visualize(save_as='testfile_tree.pdf')
