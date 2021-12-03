@@ -11,7 +11,6 @@ Download or clone the repo, go to the root folder of package and install it usin
 
 #### Dependencies
 
-* [NetworkX](https://networkx.github.io/)
 * [Numpy](https://numpy.org)
 * [Scipy](http://www.scipy.org/install.html)
 * [Matplotlib](https://matplotlib.org/)

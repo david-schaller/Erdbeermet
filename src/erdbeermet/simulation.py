@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import networkx as nx
 
 import erdbeermet.tools.FileIO as FileIO
 
@@ -80,7 +79,7 @@ class Scenario:
         visited = {0}
         ordering = [0]
         while True:
-            succ = next(self.L.successors(ordering[-1]))
+            succ = self._circ_order[ordering[-1]]
             if succ in visited:
                 break
             else:
@@ -121,10 +120,7 @@ class Scenario:
         # initialize circular as True and set to False if non-neighbor merge
         # event is encountered
         self.circular = True
-        self.L = nx.DiGraph()
-        L = self.L
-        L.add_node(0)
-        L.add_edge(0, 0)
+        self._circ_order = {0: 0}
             
         for x, y, z, alpha, delta in self.history:
             
@@ -144,17 +140,19 @@ class Scenario:
                     D[z, u] = D[x, z]
                     
                 if self.circular:
-                    L.remove_edge(x, y)
-                    L.add_edge(x, z)
-                    L.add_edge(z, y)
+                    old_succ = self._circ_order[x]
+                    self._circ_order[x] = z
+                    self._circ_order[z] = old_succ
                     
             # recombination event      
             else:
                 if self.circular:
-                    if L.has_edge(x, y):
-                        L.remove_edge(x, y)
-                        L.add_edge(x, z)
-                        L.add_edge(z, y)
+                    if self._circ_order[x] == y:
+                        self._circ_order[x] = z
+                        self._circ_order[z] = y
+                    elif self._circ_order[y] == x:
+                        self._circ_order[y] = z
+                        self._circ_order[z] = x
                     else:
                         self.circular = False
                 
@@ -210,9 +208,7 @@ def random_history(N, branching_prob=0.0, circular=False, clocklike=False):
     history = []
     
     if circular:
-        L = nx.DiGraph()
-        L.add_node(0)
-        L.add_edge(0, 0)
+        successors = {0: 0}
     
     for z in range(1, N):
         
@@ -223,10 +219,9 @@ def random_history(N, branching_prob=0.0, circular=False, clocklike=False):
             y, alpha = x, 1.0           # for the history
                 
             if circular:
-                y = next(L.successors(x))
-                L.remove_edge(x, y)
-                L.add_edge(x, z)
-                L.add_edge(z, y)
+                y = successors[x]
+                successors[x] = z
+                successors[z] = y
                 
         # recombination event      
         else:
@@ -234,11 +229,9 @@ def random_history(N, branching_prob=0.0, circular=False, clocklike=False):
                 x, y = np.random.choice(z, size=2, replace=False)
             else:
                 x = np.random.randint(z)
-                y = next(L.successors(x))
-                    
-                L.remove_edge(x, y)
-                L.add_edge(x, z)
-                L.add_edge(z, y)
+                y = successors[x]
+                successors[x] = z
+                successors[z] = y
                 
             alpha = np.random.random()
         

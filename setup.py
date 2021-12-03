@@ -24,6 +24,5 @@ setuptools.setup(
         'numpy>=1.16.4',
         'scipy>=1.3.0',
         'matplotlib>=3.0',
-        'networkx>=2.2',
    ],
 )
