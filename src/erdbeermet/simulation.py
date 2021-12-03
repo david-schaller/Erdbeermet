@@ -7,27 +7,72 @@ import erdbeermet.tools.FileIO as FileIO
 
 
 class Scenario:
+    """Scenario for the generation of a type R matrix.
     
-    def __init__(self, N, history, circular):
+    Attributes
+    ----------
+    N : int
+        Number of items.
+    history : list of tuples
+        The history of merge and branching events.
+    circular : bool
+        Indicates whether the scenario has a circular type R matrix
+    D : 2-dimensional numpy array
+        The distance matrix.
+    
+    See Also
+    --------
+    simulate()
+    scenario_from_history()
+    load()
+    """
+    
+    def __init__(self, history):
+        """Constructor for Scenario class.
         
-        self.N = N
+        Parameters
+        ----------
+        history : list of tuples
+            The history of merge and branching events.
+        """
+        
+        self.N = len(history) + 1
         self.history = history
-        self.circular = circular
         
         self._build_matrix()
         
     
     def distances(self):
+        """Distance matrix of the scenario.
+        
+        Returns
+        -------
+        2-dimensional numpy array
+        """
         
         return self.D
     
     
     def get_history(self):
+        """History of merge and branching events.
+        
+        Returns
+        -------
+        list of tuples
+        """
         
         return self.history
     
     
     def get_circular_ordering(self):
+        """Circular ordering of the items.
+        
+        Returns
+        -------
+        list or bool
+            A list representing the circular ordering (cut between item 0 and
+            its predecessor); or False if the scenario is not circular.
+        """
         
         if not self.circular:
             return False
@@ -46,11 +91,19 @@ class Scenario:
     
     
     def write_history(self, filename):
+        """Write the event history into a file.
+        
+        Parameters
+        ----------
+        filename : str
+            Path and filename.
+        """
         
         FileIO.write_history(filename, self.history)
     
     
     def print_history(self):
+        """Print the event history into a file."""
         
         for x, y, z, alpha, delta in self.history:
             
@@ -59,15 +112,19 @@ class Scenario:
     
     
     def _build_matrix(self):
+        """Generate the distance matrix and determine whether it is circular.
+        """
         
         self.D = np.zeros((self.N, self.N))
         D = self.D
-    
-        if self.circular:
-            self.L = nx.DiGraph()
-            L = self.L
-            L.add_node(0)
-            L.add_edge(0, 0)
+        
+        # initialize circular as True and set to False if non-neighbor merge
+        # event is encountered
+        self.circular = True
+        self.L = nx.DiGraph()
+        L = self.L
+        L.add_node(0)
+        L.add_edge(0, 0)
             
         for x, y, z, alpha, delta in self.history:
             
@@ -94,12 +151,12 @@ class Scenario:
             # recombination event      
             else:
                 if self.circular:
-                    if not L.has_edge(x, y):
-                        raise RuntimeError(f'{x} and {y} are not neighbors')
-                        
-                    L.remove_edge(x, y)
-                    L.add_edge(x, z)
-                    L.add_edge(z, y)
+                    if L.has_edge(x, y):
+                        L.remove_edge(x, y)
+                        L.add_edge(x, z)
+                        L.add_edge(z, y)
+                    else:
+                        self.circular = False
                 
                 for u in range(z):
                     if u != x and u != y:
@@ -124,6 +181,31 @@ class Scenario:
 
 
 def random_history(N, branching_prob=0.0, circular=False, clocklike=False):
+    """Generate a random history of merge and branching events.
+    
+    Parameters
+    ----------
+    N : int
+        Number of items.
+    branching_prob : float, optional
+        Probability that an event is a pure branching event. The default is
+        0.0, i.e., pure branching events are disabled.
+    circular : bool, optional
+        If set to True, the resulting history is guaranteed to produce a
+        circular type R matrix. The default is False.
+    clocklike : bool, optional
+        If set to True, the distance increment is equal for all items within
+        each iteration (comprising a merge or branching event and the distance
+        increments) and only varies between iteration. The default is False,
+        in which case the increments are also drawn independently for the
+        items within an iteration.
+        
+    Returns
+    -------
+    list of tuples
+        Each tuple corresponds to an iteration comprising a merge or branching
+        event and the distance increments.
+    """
     
     history = []
     
@@ -172,19 +254,55 @@ def random_history(N, branching_prob=0.0, circular=False, clocklike=False):
 
 
 def simulate(N, branching_prob=0.0, circular=False, clocklike=False):
+    """Simulate a random type R matrix.
     
-    if circular and branching_prob > 0.0:
-        raise ValueError('pure duplication events are not allowed for '\
-                         'circular type R metrics')
+    Parameters
+    ----------
+    N : int
+        Number of items.
+    branching_prob : float, optional
+        Probability that an event is a pure branching event. The default is
+        0.0, i.e., pure branching events are disabled.
+    circular : bool, optional
+        If set to True, the resulting distance matrix is guaranteed to be a
+        circular type R matrix. The default is False.
+    clocklike : bool, optional
+        If set to True, the distance increment is equal for all items within
+        each iteration (comprising a merge or branching event and the distance
+        increments) and only varies between iteration. The default is False,
+        in which case the increments are also drawn independently for the
+        items within an iteration.
+        
+    Returns
+    -------
+    Scenario
+        Comprises the history of merge and branching events as well as the
+        distance matrix.
+    """
     
-    return Scenario(N,
-                    random_history(N, branching_prob=branching_prob,
+    # if circular and branching_prob > 0.0:
+    #     raise ValueError('pure duplication events are not allowed for '\
+    #                      'circular type R metrics')
+    
+    return Scenario(random_history(N, branching_prob=branching_prob,
                                    circular=circular,
-                                   clocklike=clocklike),
-                    circular)
+                                   clocklike=clocklike))
 
 
-def scenario_from_history(history, circular=False, stop_after=False):
+def scenario_from_history(history, stop_after=False):
+    """Generate a type R matrix from a list of merge and branching events.
+    
+    Parameters
+    ----------
+    history : list of tuples
+        The history of merge and branching events.
+        
+    Returns
+    -------
+    Scenario
+        Comprises the history of merge and branching events as well as the
+        distance matrix.
+    """
         
     if stop_after is False:
         N = len(history) + 1
@@ -193,13 +311,25 @@ def scenario_from_history(history, circular=False, stop_after=False):
     else:
         raise RuntimeError(f'not enough events to simulate {stop_after} items')
     
-    return Scenario(N, history[:N-1], circular)
+    return Scenario(history[:N-1])
 
 
-def load(filename, circular=False, stop_after=False):
+def load(filename, stop_after=False):
+    """Generate an event history from a file and generate the type R matrix.
+    
+    Parameters
+    ----------
+    filename : str
+        Path and filename.
+        
+    Returns
+    -------
+    Scenario
+        Comprises the history of merge and branching events as well as the
+        distance matrix.
+    """
     
     return scenario_from_history(FileIO.parse_history(filename),
-                                 circular=circular,
                                  stop_after=stop_after)
 
 

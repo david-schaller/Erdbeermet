@@ -36,8 +36,7 @@ print(scenario_circular.get_circular_ordering())
 scenario_circular.write_history(os.path.join(result_dir, 'testfile_history_circular'))
 
 # reload history to file
-scenario_reloaded2 = load(os.path.join(result_dir, 'testfile_history_circular'),
-                          circular=True)
+scenario_reloaded2 = load(os.path.join(result_dir, 'testfile_history_circular'))
 
 print(scenario_reloaded2.D)
 print(scenario_reloaded2.get_circular_ordering())
