@@ -102,7 +102,7 @@ class Scenario:
     
     
     def print_history(self):
-        """Print the event history into a file."""
+        """Print the event history."""
         
         for x, y, z, alpha, delta in self.history:
             
