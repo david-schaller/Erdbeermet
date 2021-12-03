@@ -8,12 +8,32 @@ __author__ = 'David Schaller'
 
 
 class TreeNode:
-    """Class 'TreeNode'.
+    """Tree node class for type R matrix recognition tree.
     
     Components for class 'Tree'. Contains a list of children as well as a
-    reference to the parent node.
-    """
+    reference to the parent node. 
+    The root of the tree corresponds to the full list of items and the full
+    distance matrix, and every other node corresponds the remaining distance
+    matrix after the application of a specific R-step (x, y: z)alpha.
     
+    Attributes
+    ----------
+    n : int
+        Number of items remaining after removal of z.
+    V : list
+        List of items after removal of z.
+    D : 2-dimensional numpy array
+        Distance matrix after removal of z and update of the distances.
+    R_step : tuple
+        x, y, z, and alpha representing the R-step (x, y: z)alpha that was
+        applied last.
+    valid_ways : int
+        Total number of recognition paths leading to a success in the subtree
+        below this node.
+    info : str
+        Info string why the recognition failed after the application of
+        this R-step (if this is the case).
+    """
     
     def __init__(self, n, V, D=None, R_step=None):
         
@@ -46,7 +66,17 @@ class TreeNode:
         
 
 class Tree:
+    """Tree for type R matrix recognition.
     
+    The root of the tree corresponds to the full list of items and the full
+    distance matrix, and every other node corresponds the remaining distance
+    matrix after the application of a specific R-step (x, y: z)alpha.
+    
+    Attributes
+    ----------
+    root : TreeNode
+        The root corresponds to the full distance matrix.
+    """
     
     def __init__(self, root):
         

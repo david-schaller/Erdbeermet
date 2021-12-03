@@ -11,29 +11,52 @@ __author__ = 'David Schaller'
 
 def is_pseudometric(D, rtol=1e-05, atol=1e-08, print_info=False, V=None,
                     return_info=False):
-    """Check whether a given matrix D is a metric."""
+    """Check whether a given distance matrix is a pseudometric.
+    
+    Parameters
+    ----------
+    D : 2-dimensional numpy array
+        Distance matrix
+    rtol : float, optional
+        Relative tolerance for equality. The default is 1e-05.
+    atol : float, optional
+        Absolute tolerance for equality. The default is 1e-08.
+    print_info : bool, optional
+        If True, print first encountered violation of the triangle inequality
+        if any.
+    V : list, optional
+        List of items (used for info output).
+    return_info : bool, optional
+        If True, return an info string as a second return value. The default
+        is False.
+    
+    Return
+    ------
+    bool or tuple of bool and str
+        True if D is a pseudometric and optionally an info string.
+    """
     
     N = D.shape[0]
     
+    # check whether all entries are non-negative
     if not np.all(np.logical_or(np.isclose(D, 0.0, rtol=rtol, atol=atol),
                                 D > 0.0)):
-        # not all positive or 0
         return False if not return_info else (False, 'negative distances')
     
+    # check whether all diagonal entries are zero
     if np.any(np.diagonal(D)):
-        # not all diagonal elements zero
         return False if not return_info else (False, 'non-zero diagonal')
     
+    # check whether the matrix is symmetric
     if not np.allclose(D, D.T, rtol=rtol, atol=atol):
-        # not symmetric
         return False if not return_info else (False, 'not symmetric')
     
+    # check the triangle inequality
     for i in range(N-1):
         for j in range(i+1, N):
             minimum = np.min(D[i, :] + D[:, j])
             if minimum < D[i, j] and not np.isclose(minimum, D[i, j],
                                                     rtol=rtol, atol=atol):
-                # violation of triangle inequality
                 if print_info or return_info:
                     argmin = np.argmin(D[i, :] + D[:, j])
                     if not V:
@@ -309,6 +332,27 @@ def _finalize_tree(recognition_tree):
     
     
 def recognize(D, first_candidate_only=False, print_info=False):
+    """Recognition of type R matrices.
+    
+    Parameters
+    ----------
+    D : 2-dimensional numpy array
+        A distance matrix.
+    first_candidate_only : bool, optional
+        If True, only consider the first found candidate for a merge event.
+        The default is False.
+    print_info : bool, True
+        If True, print the recognition history. The default is False.
+    
+    Returns
+    -------
+    Tree or bool
+        The recognition tree or False if D is not a pseudometric.
+    
+    See also
+    --------
+    tools.Tree
+    """
     
     if not is_pseudometric(D):
         if print_info: print("no metric")
