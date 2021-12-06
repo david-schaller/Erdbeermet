@@ -21,9 +21,30 @@ The package requires Python 3.7 or higher.
 
 ### Simulation
 
-#### R-steps / event histories
+#### Background
 
-The elements of the `history` are the "R-steps" comprising a merge event of `x` and `y` that creates `z` with a parameter `alpha` (if `alpha` is 0 or 1, we have a pure branching event), and additionally a list of distance increments ("`delta`s") for the currently existing items.
+R matrices are defined as distance matrices that can be obtained by repeated merge and branching events (see Prohaska et al. 2017 and the simulation steps below), the so-called  "R-steps".
+
+The construction of any R matrix `D` starts with a single item (`0` in the simulation).
+The second item (`1`) is always created by a pure branching event.
+The construction then continues with a series of merge and branching events until `N` items have been created.
+
+In the simulation, every such iteration is executed as follows:
+
+* with probability `branching_prob`, execute a pure branching event
+    * choose `x` randomly among the existing items
+    * create new item `z` such that `D[u,z]=D[x,z]` for all previously created items `u` (in particular `D[x,z]=0.0`)
+* otherwise, execute a merge event
+    * choose parents `x` and `y` randomly (if `circular=True`, they must be neighbors in a circular order that is  maintained simultaneously to the simulation)
+    * choose `alpha` from a uniform distribution on the interval (0, 1)
+    * set `D[x, z] = (1 - alpha) * D[x, y]` and `D[y, z] = alpha * D[x, y]`
+    * set `D[u, z] = alpha * D[x, u] + (1 - alpha) * D[y, u]` for all other previously created item `u`
+    * if `circular=True`, insert `z` between `x` and `y` in the circular order
+* for each item `p` created so far (including `z`), draw a distance increment `delta[p]` (here from an exponential distribution with rate parameter 1.0), if `clocklike=True` draw a common distance increment for all items
+* set `D[p, q] = D[p, q] + delta[p] + delta[q]` for all pairs `p`, `q` of items
+
+A simulation therefore can be stored as a `history` (see below), i.e., a `list` of the R-steps, each comprising a merge event of `x` and `y` that creates `z` with a parameter `alpha` (if `alpha` is 0 or 1, we have a pure branching event), and additionally a list of distance increments ("`delta`s") for the currently existing items.
+
 A history written to file has one line per R-step of the form `(x, y: z) alpha; [deltas]`.
 <details>
 <summary>Example file: (Click to expand)</summary>
@@ -59,7 +80,7 @@ The class `Scenario` acts as a wrapper for histories of merge and branching even
 | --- | --- | --- |
 | `distances()` | returns `N`x`N` `numpy` array | getter for the distance matrix |
 | `get_history()` | returns `list` of `tuple`s | getter for the event history |
-| `get_circular_ordering()` | returns `list` of `int`s | list representing the circular ordering (cut between item 0 and its predecessor); or `False` if the scenario is not circular |
+| `get_circular_order()` | returns `list` of `int`s | list representing the circular order (cut between item 0 and its predecessor); or `False` if the scenario is not circular |
 | `write_history(filename)` | parameter of type `str` | write the event history into a file |
 | `print_history()` |  | print the event history |
 

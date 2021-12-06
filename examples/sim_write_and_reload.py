@@ -30,7 +30,7 @@ scenario_reloaded.print_history()
 scenario_circular = simulate(6, circular=True)
 print(scenario_circular.D)
 scenario_circular.print_history()
-print(scenario_circular.get_circular_ordering())
+print(scenario_circular.get_circular_order())
 
 # write history to file
 scenario_circular.write_history(os.path.join(result_dir, 'testfile_history_circular'))
@@ -39,4 +39,4 @@ scenario_circular.write_history(os.path.join(result_dir, 'testfile_history_circu
 scenario_reloaded2 = load(os.path.join(result_dir, 'testfile_history_circular'))
 
 print(scenario_reloaded2.D)
-print(scenario_reloaded2.get_circular_ordering())
+print(scenario_reloaded2.get_circular_order())

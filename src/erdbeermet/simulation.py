@@ -63,13 +63,13 @@ class Scenario:
         return self.history
     
     
-    def get_circular_ordering(self):
-        """Circular ordering of the items.
+    def get_circular_order(self):
+        """Circular order of the items.
         
         Returns
         -------
         list or bool
-            A list representing the circular ordering (cut between item 0 and
+            A list representing the circular order (cut between item 0 and
             its predecessor); or False if the scenario is not circular.
         """
         
@@ -77,16 +77,16 @@ class Scenario:
             return False
         
         visited = {0}
-        ordering = [0]
+        order = [0]
         while True:
-            succ = self._circ_order[ordering[-1]]
+            succ = self._circ_order[order[-1]]
             if succ in visited:
                 break
             else:
-                ordering.append(succ)
+                order.append(succ)
                 visited.add(succ)
         
-        return ordering
+        return order
     
     
     def write_history(self, filename):
