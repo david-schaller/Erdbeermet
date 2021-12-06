@@ -346,25 +346,32 @@ def recognize(D, first_candidate_only=False, print_info=False):
     
     Returns
     -------
-    Tree or bool
-        The recognition tree or False if D is not a pseudometric.
+    Tree
+        The recognition tree.
     
     See also
     --------
     tools.Tree
     """
     
-    if not is_pseudometric(D):
-        if print_info: print("no metric")
-        return False
-    
     n = D.shape[0]
-    if n <= 3:
-        return True
-    
     V = [i for i in range(n)]
     
     recognition_tree = Tree(TreeNode(n, V, D=D)) 
+    
+    # trivial failure if not a pseudometric
+    if not is_pseudometric(D):
+        if print_info: print('no pseudometric')
+        recognition_tree.root.info = 'no pseudometric'
+        return recognition_tree
+    
+    # every pseudometric is additve and thus also an R matrix
+    if n <= 3:
+        if print_info: print(print(f'SUCCESS on {V}'))
+        recognition_tree.root.valid_ways = 1
+        return recognition_tree
+    
+    # otherwise start the recognition algorithm
     stack = [recognition_tree.root]
     
     while stack:
@@ -414,7 +421,7 @@ def recognize(D, first_candidate_only=False, print_info=False):
                                                             V=V_copy)
                 
                 if not still_metric:
-                    if print_info: print('         |___ no pseudometric')
+                    if print_info: print( '         |___ no pseudometric')
                     if print_info: print(f'         |___ {metric_info}')
                     child.info = 'no pseudometric'
                     continue

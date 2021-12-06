@@ -104,13 +104,13 @@ The parameter `stop_after` can be set to an `int` x>0 to only include the R-step
 
 #### Background
 
-Recognition of R matrices works by identifying a candidate for the last R-step `(x, y: z) alpha` removing `z` from the distance matrix and updating the distances according to specific rules.
+Recognition of R matrices works by identifying a candidate for the last R-step `(x, y: z) alpha`, removing `z` from the distance matrix, and updating the distances according to specific rules.
 This process is repeated until certain conditions are no longer satisfied (in which case the reconstruction path is not a valid reconstruction of the history) or until only 4 items remain.
 A distance matrix on 4 items can be recognized as an R matrix using a specific formula.
 
 A problem arises as there are often multiple candidates for the last R-step.
 Multiple cases can occur for a specific candidate:
-* it is the true last R-steps
+* it is the true last R-step
 * it is one of the true last R-steps (that happened in different branches and did not take part in any merging event later)
 * it is not an R-step that occurred in the "true" history but it admits the reconstruction of an alternative history that produces the same R matrix
 * it is not an R-step that occurred in the "true" history and we will eventually hit a "dead end" if we choose this candidate no matter which candidate decisions we make later
@@ -119,14 +119,31 @@ The last point is critical since it implies that we have to try all candidates (
 Since this is true for every iteration, there is a possibly exponential number of reconstruction paths that have to be checked.
 If a valid R matrix is given as input, at least one of these paths will return a successful reconstruction of a history that explains it.
 
-The module `erdbeermet.recognition` currently follows this approach, i.e., it follows tries all possible candidates.
-The overall recognition process can therefore be represented by a tree with the root representing the full input distance matrix and every vertex having one children per candidate R-step `(x, y: z) alpha`. Moreover, every such child is associated with the distance matrix obtained by removing the line and column corresponding to `z` updating the remaining distances accordingly.
+The module `erdbeermet.recognition` currently follows this approach, i.e., it tries all possible candidates.
+The overall recognition process can therefore be represented by a tree with the root representing the full input distance matrix and every vertex having one children per candidate R-step `(x, y: z) alpha`. Moreover, every such child is associated with the distance matrix obtained by removing the line and column corresponding to `z` and updating the remaining distances accordingly.
 A vertex is a leaf when it has no valid candidate R-steps or none of them produces an updated distance matrix that still satisfies certain necessary conditions of R matrices (pseudometric, ...).
 Also, vertices corresponding to 4x4 matrices are always leaves as, for them, it can be decided immediately whether or not they are R matrices.
 
 #### Recognition trees
 
-(description)
+The function `recognize()` in the module `erdbeermet.recognition` takes a distance matrix `D` as input and returns the recognition tree as described in the previous section (instance of type `Tree` with attribute `root` of type `TreeNode`).
+
+<details>
+<summary>The tree nodes have the following attributes: (Click to expand)</summary>
+
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `parent` | `TreeNode` | the parent node (`None` for the root) |
+| `children` | `list` of `TreeNode`s | child node (empty for the leaves) |
+| `n` | `int` | the number of remaining items |
+| `V` | `list` of `int`s | the list of remaining items |
+| `D` | `n`x`n` `numpy` array | the distance matrix |
+| `R_step` | `tuple` | the last R-steps that was identified and used to obtain `D` from the parents `n+1`x`n+1` matrix (order `x`, `y`, `z`, `alpha`); equals `None` for the root |
+| `valid_ways` | `int` | total number of recognition paths leading to a success in the subtree below this node |
+| `info` | `str` | info string why the recognition failed after the application of the R-step (if this is the case) |
+
+</details>
+
 
 
 ## References
