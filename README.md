@@ -190,7 +190,7 @@ All (pseudo)metrics on four items can be represented by a "box graph".
 The four items are the leaves, i.e., the vertices with degree one.
 Their distances are given by the sum of edge lengths of any shortest path.
 
-![example_tree](examples/example_box.svg)
+![example_box](examples/example_box.svg)
 
 The sides of the rectangle are `r` and `s`. The "spikes" are the edges incident with the leaves `x`, `y`, `z`, and `u`.
 Here, the spike of `u` has length 0.
