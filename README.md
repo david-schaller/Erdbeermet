@@ -83,6 +83,8 @@ Instances of `Scenario` can be generated using the function `simulate()` in the 
 
 Simulated scenarios can be saved to a file (in form of their event history) using their function `write_history(filename)`.
 
+    from erdbeermet.simulation import simulate
+
     # simulate a scenario with six items
     scenario = simulate(6, branching_prob=0.3, circular=True, clocklike=False)
 
@@ -126,7 +128,7 @@ Also, vertices corresponding to 4x4 matrices are always leaves as, for them, it 
 
 #### Recognition trees
 
-The function `recognize()` in the module `erdbeermet.recognition` takes a distance matrix `D` as input and returns the recognition tree as described in the previous section (instance of type `Tree` with attribute `root` of type `TreeNode`).
+The function `recognize(D)` in the module `erdbeermet.recognition` takes a distance matrix `D` as input and returns the recognition tree as described in the previous section (instance of type `Tree` with attribute `root` of type `TreeNode`).
 
 <details>
 <summary>The tree nodes have the following attributes: (Click to expand)</summary>
@@ -144,7 +146,42 @@ The function `recognize()` in the module `erdbeermet.recognition` takes a distan
 
 </details>
 
+The input distance matrix was an R matrix if `recognition_tree.root.valid_ways > 0` for the `recognition_tree` returned by the function `recognize(D)`.
 
+This function has an optional parameter `first_candidate_only` (default `False`) which, when set to `True`, results in the algorithm only considering the first valid candidate R-step (that also produces a pseudometric and non-negative deltas) in every iteration.
+As a consequence, the algorithm is guaranteed to finish in polynomial time. However, it may encounter a "dead end" even though the input was an R matrix.
+
+The function also has an optional parameter `print_info` (default `False`). When it is set to `True`, information on the ongoing recognition is printed to the console.
+
+There are several ways to output/analyze the result of a recognition, i.e., the recognition tree:
+
+    from erdbeermet.simulation import simulate
+    from erdbeermet.recognition import recognize
+
+    # simulate scenario (alternatively load from file or create a custom distance matrix) and recognize
+    scenario = simulate(6)
+    recognition_tree = recognize(scenario.D, print_info=True)
+
+    # write the recognition steps into a file
+    recognition_tree.write_to_file('path/to/recognition.txt')
+
+    # visualize the tree (and optionally save the graphic)
+    recognition_tree.visualize(save_as='path/to/tree_visualization.pdf')
+
+    # print a Newick representation
+    recognition_tree.to_newick()
+
+    # traverse the tree
+    for node in recognition_tree.preorder():   # or postorder()
+        # do something fancy with node
+        pass
+
+The visualization of a recognition tree looks as follows:
+
+![example_tree](examples/example_tree.svg)
+
+Red nodes indicate dead ends and subtrees without any successful recognition path.
+In contrast, green leaves and inner nodes indicate metrics on 4 vertices that are R metrics and subtrees with at least one successful path, respectively.
 
 ## References
 
