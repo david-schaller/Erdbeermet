@@ -29,17 +29,18 @@ The construction of any R matrix `D` starts with a single item (`0` in the simul
 The second item (`1`) is always created by a pure branching event.
 The construction then continues with a series of merge and branching events until `N` items have been created.
 
-In the simulation, every such iteration is executed as follows:
+In the simulation, every such iteration is executed as follows (the distances are always updated symmetrically, i.e., such that `D[i, j] = D[j, i]`):
 
 * with probability `branching_prob`, execute a pure branching event
     * choose `x` randomly among the existing items
-    * create new item `z` such that `D[u,z]=D[x,z]` for all previously created items `u` (in particular `D[x,z]=0.0`)
+    * create a new item `z` such that `D[u,z]=D[x,z]` for all previously created items `u` (in particular `D[x,z]=0.0`)
 * otherwise, execute a merge event
     * choose parents `x` and `y` randomly (if `circular=True`, they must be neighbors in a circular order that is  maintained simultaneously to the simulation)
     * choose `alpha` from a uniform distribution on the interval (0, 1)
-    * set `D[x, z] = (1 - alpha) * D[x, y]` and `D[y, z] = alpha * D[x, y]`
-    * set `D[u, z] = alpha * D[x, u] + (1 - alpha) * D[y, u]` for all other previously created item `u`
-    * if `circular=True`, insert `z` between `x` and `y` in the circular order
+    * create a new item `z`
+        * set `D[x, z] = (1 - alpha) * D[x, y]` and `D[y, z] = alpha * D[x, y]`
+        * set `D[u, z] = alpha * D[x, u] + (1 - alpha) * D[y, u]` for all other previously created item `u`
+        * if `circular=True`, insert `z` between `x` and `y` in the circular order
 * for each item `p` created so far (including `z`), draw a distance increment `delta[p]` (here from an exponential distribution with rate parameter 1.0), if `clocklike=True` draw a common distance increment for all items
 * set `D[p, q] = D[p, q] + delta[p] + delta[q]` for all pairs `p`, `q` of items
 
