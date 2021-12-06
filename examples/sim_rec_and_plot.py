@@ -35,4 +35,4 @@ recognition_tree.visualize(decimal_prec=5, save_as=False)
 # save the plot as pdf by specififying the parameter:
 #      --> save_as='valid/path/filename_ending_with.pdf'
 
-recognition_tree.visualize(save_as='testfile_tree.svg')
+# recognition_tree.visualize(save_as='testfile_tree.svg')

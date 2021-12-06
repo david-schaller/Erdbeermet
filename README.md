@@ -183,6 +183,30 @@ The visualization of a recognition tree looks as follows:
 Red nodes indicate dead ends and subtrees without any successful recognition path.
 In contrast, green leaves and inner nodes indicate metrics on 4 vertices that are R metrics and subtrees with at least one successful path, respectively.
 
+
+### Box graphs
+
+All (pseudo)metrics on four items can be represented by a "box graph".
+The four items are the leaves, i.e., the vertices with degree one.
+Their distances are given by the sum of edge lengths of any shortest path.
+
+![example_tree](examples/example_box.svg)
+
+The sides of the rectangle are `r` and `s`. The "spikes" are the edges incident with the leaves `x`, `y`, `z`, and `u`.
+Here, the spike of `u` has length 0.
+
+The function `plot_box_graph` in the module `erdbeermet.visualize.BoxGraphVis` takes a distance matrix on four items as input and visualizes it as a box graph:
+
+    from erdbeermet.simulation import simulate
+    from erdbeermet.visualize.BoxGraphVis import plot_box_graph
+
+    # simulate scenario on 4 items
+    scenario = simulate(4)
+
+    # plot box graph with custom leaf labels
+    plot_box_graph(scenario.D, labels=['a', 'b', 'c', 'd'])
+
+
 ## References
 
 What are R pseudometrics/matrices?

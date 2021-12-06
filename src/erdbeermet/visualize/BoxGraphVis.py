@@ -257,24 +257,24 @@ class Box4:
 
 if __name__ == "__main__":
     
-#    metric = np.array([[0.0, 1.5, 1.0, 1.0],
-#                       [1.5, 0.0, 1.0, 1.0],
-#                       [1.0, 1.0, 0.0, 1.0],
-#                       [1.0, 1.0, 1.0, 0.0]])
+    # metric = np.array([[0.0, 1.5, 1.0, 1.0],
+    #                   [1.5, 0.0, 1.0, 1.0],
+    #                   [1.0, 1.0, 0.0, 1.0],
+    #                   [1.0, 1.0, 1.0, 0.0]])
     
-#    b = np.array([4.0,      # x y
-#                  4.0,      # x z
-#                  3.5,      # x u
-#                  4.0,      # y z
-#                  1.5,      # y u
-#                  2.5,      # z u
-#                  ])
-#    
-#    box = Box4(b)
-#    print(box._diagonal_mode)
-#    print(box.solutions)
-#    print(box.first_solution())
-#    box.plot()
+    # b = np.array([4.0,      # x y
+    #               4.0,      # x z
+    #               3.5,      # x u
+    #               4.0,      # y z
+    #               1.5,      # y u
+    #               2.5,      # z u
+    #               ])
+    
+    # box = Box4(b)
+    # print(box._diagonal_mode)
+    # print(box.solutions)
+    # print(box.first_solution())
+    # box.plot()
     
     D = np.array([[0.00000000,  1.25760184,  1.05214628,  0.29456482],
                   [1.25760184,  0.00000000,  0.42562244,  1.09231702],
