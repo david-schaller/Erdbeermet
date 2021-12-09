@@ -105,7 +105,7 @@ Instances of `Scenario` can be generated using the function `simulate()` in the 
 
 Simulated scenarios can be saved to a file (in form of their event history) using their function `write_history(filename)`.
 
-    from erdbeermet.simulation import simulate
+    from erdbeermet.simulation import simulate, load
 
     # simulate a scenario with six items
     scenario = simulate(6, branching_prob=0.3, circular=True, clocklike=False)
