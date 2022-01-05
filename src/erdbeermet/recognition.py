@@ -357,22 +357,23 @@ def recognize(D, first_candidate_only=False, print_info=False):
     n = D.shape[0]
     V = [i for i in range(n)]
     
-    recognition_tree = Tree(TreeNode(n, V, D=D)) 
+    recognition_tree = Tree(TreeNode(n, V, D=D))
+    stack = []
     
     # trivial failure if not a pseudometric
     if not is_pseudometric(D):
         if print_info: print('no pseudometric')
         recognition_tree.root.info = 'no pseudometric'
-        return recognition_tree
     
     # every pseudometric is additve and thus also an R matrix
-    if n <= 3:
+    elif n <= 3:
         if print_info: print(print(f'SUCCESS on {V}'))
         recognition_tree.root.valid_ways = 1
-        return recognition_tree
     
     # otherwise start the recognition algorithm
-    stack = [recognition_tree.root]
+    else:
+        stack.append(recognition_tree.root)
+    
     
     while stack:
         
