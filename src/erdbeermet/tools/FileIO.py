@@ -25,7 +25,7 @@ def _split_floats(floats):
 
 def parse_history(filename):
     
-    event_regex = re.compile(r"\((\d+)\,\s*(\d+)\:\s*(\d+)\)\;?\s*(\d+\.?\d*)\;\s*\[(?P<delta>(\s*\d+\.?\d*e?-?\d+,?)+)\]")
+    event_regex = re.compile(r"\((\d+)\,\s*(\d+)\:\s*(\d+)\)\;?\s*(\d+\.?\d*e?-?\d+)\;\s*\[(?P<delta>(\s*\d+\.?\d*e?-?\d+,?)+)\]")
     
     with open(filename, 'r') as f:
         
