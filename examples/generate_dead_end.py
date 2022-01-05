@@ -16,6 +16,10 @@ while True:
                                  first_candidate_only=True)
     
     if recognition_tree.valid_ways == 0:
+        print('\n')
+        scenario.print_history()
+        
+        print('\n')
         print(scenario.D)
     
         print('\n')
